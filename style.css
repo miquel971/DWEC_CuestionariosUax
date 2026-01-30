@@ -91,3 +91,9 @@ button {
     background: #fff;
     color: #000;
 }
+
+/* Estilo para el nuevo botón de borrar progreso */
+.danger {
+    background: #dc3545 !important;
+    margin-top: 10px;
+}

@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DWEC - Repaso Oficial</title>
+    <title>DWEC - Repaso Oficial 2026</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>DWEC: Unidades 1 a 7</h1>
+            <p class="subtitle">Batería de preguntas oficial - Persistencia Activa</p>
             <div class="stats-bar">
-                <span id="contador-aciertos">Respondidas: 0 / 30</span>
+                <span id="contador-aciertos">Cargando banco de preguntas...</span>
             </div>
         </header>
         
@@ -19,11 +20,13 @@
         
         <div class="controls">
             <button id="btn-calcular" onclick="mostrarResultadoFinal()">Calcular Nota Final</button>
-            <button id="btn-reset" onclick="reiniciarTest()">Generar Nuevo Test (30 preguntas)</button>
+            <button id="btn-reset" onclick="reiniciarTest()">Siguiente tanda (30 preguntas)</button>
+            <button id="btn-hard-reset" class="danger" onclick="resetearProgreso()">Resetear Banco Completo</button>
         </div>
 
         <div id="nota-final" class="resultado-panel" style="display:none;"></div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

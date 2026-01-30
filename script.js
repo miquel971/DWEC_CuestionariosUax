@@ -123,6 +123,9 @@ let seleccionadas = [];
 let respondidas = 0;
 let aciertos = 0;
 
+// Recuperamos el historial del localStorage
+let respondidasGlobalmente = JSON.parse(localStorage.getItem('respondidasUF')) || [];
+
 function escapeHTML(text) {
     const p = document.createElement('p');
     p.textContent = text;
@@ -130,11 +133,23 @@ function escapeHTML(text) {
 }
 
 function iniciarTest() {
-    seleccionadas = [...bancoPreguntas].sort(() => 0.5 - Math.random()).slice(0, 30);
+    // 1. Filtrar preguntas que NO están en el historial de acertadas
+    let poolDisponibles = bancoPreguntas.filter(p => !respondidasGlobalmente.includes(p.q));
+
+    // 2. Si se agotan, avisamos
+    if (poolDisponibles.length === 0) {
+        alert("¡Felicidades! Has completado todas las preguntas de la batería oficial.");
+        return;
+    }
+
+    // 3. Selección aleatoria de 30 o las que queden
+    let numASeleccionar = Math.min(30, poolDisponibles.length);
+    seleccionadas = poolDisponibles.sort(() => 0.5 - Math.random()).slice(0, numASeleccionar);
     seleccionadas.sort((a,b) => a.uf - b.uf);
+
     respondidas = 0; aciertos = 0;
     document.getElementById('nota-final').style.display = 'none';
-    actualizarMarcador();
+    actualizarMarcador(numASeleccionar);
     render();
 }
 
@@ -163,6 +178,8 @@ function verificar(pIndex, oIndex) {
     if (oIndex === pregunta.correct) {
         seleccionada.classList.add('correcta');
         aciertos++;
+        // Al acertar, la guardamos en el historial para "borrarla" del siguiente test
+        marcarComoVista(pregunta.q);
     } else {
         seleccionada.classList.add('incorrecta');
         correcta.classList.add('correcta');
@@ -170,19 +187,28 @@ function verificar(pIndex, oIndex) {
 
     block.classList.add('bloqueado');
     respondidas++;
-    actualizarMarcador();
+    actualizarMarcador(seleccionadas.length);
+}
+
+function marcarComoVista(preguntaTexto) {
+    if (!respondidasGlobalmente.includes(preguntaTexto)) {
+        respondidasGlobalmente.push(preguntaTexto);
+        localStorage.setItem('respondidasUF', JSON.stringify(respondidasGlobalmente));
+    }
 }
 
 function mostrarResultadoFinal() {
     const nota = ((aciertos / seleccionadas.length) * 10).toFixed(2);
     const panel = document.getElementById('nota-final');
     panel.style.display = 'block';
-    panel.innerHTML = `TEST FINALIZADO<br>Aciertos: ${aciertos} / 30<br>NOTA: ${nota} / 10`;
+    panel.innerHTML = `TEST FINALIZADO<br>Aciertos: ${aciertos} / ${seleccionadas.length}<br>NOTA: ${nota} / 10`;
     panel.scrollIntoView({ behavior: 'smooth' });
 }
 
-function actualizarMarcador() {
-    document.getElementById('contador-aciertos').innerText = `Respondidas: ${respondidas} / 30`;
+function actualizarMarcador(total) {
+    const restantesBanco = bancoPreguntas.length - respondidasGlobalmente.length;
+    document.getElementById('contador-aciertos').innerHTML = 
+        `Respondidas: ${respondidas} / ${total} | <b>Disponibles en el banco: ${restantesBanco}</b>`;
 }
 
 function reiniciarTest() { window.scrollTo(0,0); iniciarTest(); }
