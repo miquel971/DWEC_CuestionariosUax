@@ -136,9 +136,9 @@ function iniciarTest() {
     // 1. Filtrar preguntas que NO están en el historial de acertadas
     let poolDisponibles = bancoPreguntas.filter(p => !respondidasGlobalmente.includes(p.q));
 
-    // 2. Si se agotan, avisamos
+    // 2. Si se agotan todas las de las UF1 a la UF7
     if (poolDisponibles.length === 0) {
-        alert("¡Felicidades! Has completado todas las preguntas de la batería oficial.");
+        alert("¡Felicidades! Has completado todas las preguntas del banco oficial.");
         return;
     }
 
@@ -178,7 +178,7 @@ function verificar(pIndex, oIndex) {
     if (oIndex === pregunta.correct) {
         seleccionada.classList.add('correcta');
         aciertos++;
-        // Al acertar, la guardamos en el historial para "borrarla" del siguiente test
+        // Al acertar, la guardamos para que no vuelva a salir hasta el reset
         marcarComoVista(pregunta.q);
     } else {
         seleccionada.classList.add('incorrecta');
@@ -208,9 +208,21 @@ function mostrarResultadoFinal() {
 function actualizarMarcador(total) {
     const restantesBanco = bancoPreguntas.length - respondidasGlobalmente.length;
     document.getElementById('contador-aciertos').innerHTML = 
-        `Respondidas: ${respondidas} / ${total} | <b>Disponibles en el banco: ${restantesBanco}</b>`;
+        `Respondidas: ${respondidas} / ${total} | <b>Nuevas disponibles: ${restantesBanco}</b>`;
 }
 
-function reiniciarTest() { window.scrollTo(0,0); iniciarTest(); }
+// ESTA FUNCIÓN ES LA QUE TE FALTABA PARA EL HARD RESET
+function resetearProgreso() {
+    if(confirm("¿Seguro? Se borrarán todos tus aciertos guardados de la UF1 a la UF7.")) {
+        localStorage.removeItem('respondidasUF'); // Borra la memoria del navegador
+        respondidasGlobalmente = []; // Vaciamos el array actual
+        iniciarTest(); // Lanzamos un test nuevo con todas las preguntas
+    }
+}
+
+function reiniciarTest() { 
+    window.scrollTo(0,0); 
+    iniciarTest(); 
+}
 
 iniciarTest();
